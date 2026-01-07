@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Home, Search, User, Settings, LogOut, X, Menu, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
