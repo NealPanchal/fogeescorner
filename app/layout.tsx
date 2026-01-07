@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { DM_Sans, Funnel_Display, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
@@ -24,12 +24,16 @@ export const metadata: Metadata = {
   title: "Fogees Corner",
   description: "A Fogees social media platform",
   generator: "v0.app",
-  viewport: "width=device-width, initial-scale=1",
   icons: {
     icon: "/icon.svg",
     shortcut: "/icon.svg",
     apple: "/apple-icon.png",
   },
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 }
 
 export default function RootLayout({
