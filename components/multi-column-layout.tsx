@@ -1,13 +1,14 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import type { ReactNode } from "react"
 import { getTrendingPosts } from "@/lib/trending"
 import { ExternalLink, TrendingUp } from "lucide-react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { db, collection, getDocs } from "@/lib/firebase"
-import { auth } from "@/lib/firebase"
+import { db, auth } from "@/lib/firebase"
+import { collection, getDocs } from "firebase/firestore"
 import type { Post } from "@/types"
 
 interface MultiColumnLayoutProps {
@@ -21,8 +22,8 @@ export function MultiColumnLayout({ sidebar, mainContent, rightColumn }: MultiCo
   return (
     <div className="min-h-screen bg-background main-gradient">
       <div className="flex">
-        {/* Left Sidebar - Fixed on desktop, hidden on mobile */}
-        <div className="hidden lg:block fixed left-0 top-0 h-full w-64 lg:w-72 z-50">
+        {/* Left Sidebar - Fixed on desktop, handled by sidebar component on mobile */}
+        <div className="fixed left-0 top-0 h-full w-64 lg:w-72 z-50">
           {sidebar}
         </div>
 
@@ -73,7 +74,6 @@ export function RightColumnTrends() {
         setTrendingPosts(posts)
         
         // Load suggested users from database
-        const { collection, getDocs, auth } = await import('@/lib/firebase')
         const usersRef = collection(db, "users")
         const snapshot = await getDocs(usersRef)
         
