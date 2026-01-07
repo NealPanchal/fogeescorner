@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { PostCard } from "@/components/post-card"
+import { notifyFollow } from "@/lib/notifications"
 import type { Post, UserProfile } from "@/types"
 
 interface ProfileViewProps {
@@ -103,6 +104,17 @@ export function ProfileView({ userId, onBack, onSettingsClick }: ProfileViewProp
           followers: arrayUnion(currentUserId)
         })
         setIsFollowing(true)
+        
+        // Send notification to the user being followed
+        const currentUser = auth.currentUser
+        if (currentUser && userProfile) {
+          await notifyFollow(
+            userId,
+            currentUserId,
+            currentUser.displayName || "Anonymous",
+            currentUser.photoURL || null
+          )
+        }
       }
     } catch (error) {
       console.error("Error toggling follow:", error)
@@ -132,81 +144,97 @@ export function ProfileView({ userId, onBack, onSettingsClick }: ProfileViewProp
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={onBack}>
+        <Button variant="ghost" onClick={onBack} className="touch-target">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
-        <h1 className="text-2xl font-bold">Profile</h1>
+        <h1 className="text-2xl font-bold type-headline">Profile</h1>
       </div>
 
       {/* Profile Card */}
-      <Card className="fogees-card">
+      <Card className="fogees-card overflow-hidden">
         <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-20 w-20">
-                <AvatarImage src={userProfile.photoURL || undefined} alt={userProfile.displayName} />
-                <AvatarFallback className="text-lg">
-                  {userProfile.displayName.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h2 className="text-xl font-bold">{userProfile.displayName}</h2>
-                <p className="text-sm text-muted-foreground">
-                  {userProfile.followers?.length || 0} followers • {userProfile.following?.length || 0} following
-                </p>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <Avatar className="h-20 w-20 sm:h-24 sm:w-24">
+              <AvatarImage src={userProfile.photoURL || undefined} alt={userProfile.displayName} />
+              <AvatarFallback className="text-lg sm:text-xl">
+                {userProfile.displayName.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl sm:text-2xl font-bold type-headline truncate">{userProfile.displayName}</h2>
+              <p className="text-sm text-muted-foreground mb-2">
+                {userProfile.followers?.length || 0} followers • {userProfile.following?.length || 0} following
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                {isOwnProfile ? (
+                  <Button onClick={onSettingsClick} className="touch-target">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Settings
+                  </Button>
+                ) : (
+                  <Button
+                    variant={isFollowing ? "outline" : "default"}
+                    onClick={handleFollow}
+                    className="touch-target"
+                  >
+                    {isFollowing ? (
+                      <>
+                        <UserCheck className="h-4 w-4 mr-2" />
+                        Following
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Follow
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
-            </div>
-            <div className="flex gap-2">
-              {isOwnProfile ? (
-                <Button onClick={onSettingsClick}>
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
-                </Button>
-              ) : (
-                <Button
-                  variant={isFollowing ? "outline" : "default"}
-                  onClick={handleFollow}
-                >
-                  {isFollowing ? (
-                    <>
-                      <UserCheck className="h-4 w-4 mr-2" />
-                      Following
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Follow
-                    </>
-                  )}
-                </Button>
-              )}
             </div>
           </div>
         </CardHeader>
         {userProfile.bio && (
           <CardContent className="pt-0">
-            <p className="text-sm">{userProfile.bio}</p>
+            <div className="bg-secondary/30 rounded-lg p-4">
+              <p className="text-sm type-body leading-relaxed">{userProfile.bio}</p>
+            </div>
           </CardContent>
         )}
       </Card>
 
-      {/* Posts */}
+      {/* Posts Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Posts</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold type-headline">Posts</h3>
+          <div className="text-sm text-muted-foreground">
+            {userPosts.length} {userPosts.length === 1 ? 'post' : 'posts'}
+          </div>
+        </div>
         {userPosts.length > 0 ? (
-          userPosts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              currentUserId={currentUserId || undefined}
-              currentUser={auth.currentUser}
-            />
-          ))
+          <div className="space-y-4">
+            {userPosts.map((post) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                currentUserId={currentUserId || undefined}
+                currentUser={auth.currentUser}
+              />
+            ))}
+          </div>
         ) : (
           <Card className="fogees-card">
             <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">No posts yet</p>
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                <UserPlus className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <p className="text-muted-foreground type-body">No posts yet</p>
+              {isOwnProfile && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  Share your first post to get started!
+                </p>
+              )}
             </CardContent>
           </Card>
         )}

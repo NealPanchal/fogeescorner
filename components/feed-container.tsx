@@ -136,8 +136,20 @@ export function FeedContainer() {
           isMobileOpen={isMobileMenuOpen}
           onMobileClose={() => setIsMobileMenuOpen(false)}
         />
-        <div className="lg:ml-64 lg:ml-72">
+        <div className="hidden lg:block lg:ml-64 lg:ml-72">
           <div className="sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border p-4 lg:hidden">
+            <MobileMenuToggle 
+              isOpen={isMobileMenuOpen} 
+              onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+            />
+          </div>
+          <main className="container mx-auto max-w-2xl px-4 py-8 md:py-12">
+            <SettingsPage user={user} onBack={handleBackToFeed} />
+          </main>
+        </div>
+        {/* Mobile layout */}
+        <div className="lg:hidden">
+          <div className="sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border p-4">
             <MobileMenuToggle 
               isOpen={isMobileMenuOpen} 
               onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
@@ -161,8 +173,24 @@ export function FeedContainer() {
           isMobileOpen={isMobileMenuOpen}
           onMobileClose={() => setIsMobileMenuOpen(false)}
         />
-        <div className="lg:ml-64 lg:ml-72">
+        <div className="hidden lg:block lg:ml-64 lg:ml-72">
           <div className="sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border p-4 lg:hidden">
+            <MobileMenuToggle 
+              isOpen={isMobileMenuOpen} 
+              onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+            />
+          </div>
+          <main className="container mx-auto max-w-2xl px-4 py-8 md:py-12">
+            <ProfileView 
+              userId={profileUserId} 
+              onBack={handleBackToFeed}
+              onSettingsClick={() => setCurrentView("settings")}
+            />
+          </main>
+        </div>
+        {/* Mobile layout */}
+        <div className="lg:hidden">
+          <div className="sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border p-4">
             <MobileMenuToggle 
               isOpen={isMobileMenuOpen} 
               onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
@@ -190,8 +218,23 @@ export function FeedContainer() {
           isMobileOpen={isMobileMenuOpen}
           onMobileClose={() => setIsMobileMenuOpen(false)}
         />
-        <div className="lg:ml-64 lg:ml-72">
+        <div className="hidden lg:block lg:ml-64 lg:ml-72">
           <div className="sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border p-4 lg:hidden">
+            <MobileMenuToggle 
+              isOpen={isMobileMenuOpen} 
+              onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+            />
+          </div>
+          <main className="container mx-auto max-w-2xl px-4 py-8 md:py-12">
+            <div className="space-y-6">
+              <h1 className="text-2xl font-bold">Search Users</h1>
+              <UserSearch onProfileView={handleProfileView} />
+            </div>
+          </main>
+        </div>
+        {/* Mobile layout */}
+        <div className="lg:hidden">
+          <div className="sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border p-4">
             <MobileMenuToggle 
               isOpen={isMobileMenuOpen} 
               onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 

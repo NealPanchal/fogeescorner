@@ -139,6 +139,23 @@ export function SettingsPage({ user, onBack }: SettingsPageProps) {
                 Show your daily post limit ({todayPostCount}/{DAILY_POST_LIMIT})
               </p>
             </div>
+            <Switch
+              id="daily-counter"
+              checked={settings.postingAndEngagement.showDailyPostCounter}
+              onCheckedChange={(checked) => 
+                handleSettingChange('postingAndEngagement', 'showDailyPostCounter', checked)
+              }
+              disabled={saving}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <Label>Current Daily Posts</Label>
+              <p className="text-sm text-muted-foreground">
+                Posts you've made today
+              </p>
+            </div>
             <Badge variant="secondary" className="font-mono">
               {todayPostCount}/{DAILY_POST_LIMIT}
             </Badge>

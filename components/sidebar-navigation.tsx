@@ -2,10 +2,12 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Home, Search, User, Settings, LogOut, X, Menu } from "lucide-react"
+import { Home, Search, User, Settings, LogOut, X, Menu, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { NotificationCenter, NotificationButton } from "@/components/notification-center"
 import { auth } from "@/lib/firebase"
 import { cn } from "@/lib/utils"
+import { subscribeToNotifications } from "@/lib/notifications"
 
 interface SidebarNavigationProps {
   currentView: string
@@ -17,6 +19,18 @@ interface SidebarNavigationProps {
 
 export function SidebarNavigation({ currentView, onViewChange, user, isMobileOpen, onMobileClose }: SidebarNavigationProps) {
   const router = useRouter()
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    if (!auth.currentUser) return
+
+    const unsubscribe = subscribeToNotifications(auth.currentUser.uid, (notifications) => {
+      setUnreadCount(notifications.filter(n => !n.read).length)
+    })
+
+    return unsubscribe
+  }, [])
 
   const handleSignOut = async () => {
     try {
@@ -78,25 +92,31 @@ export function SidebarNavigation({ currentView, onViewChange, user, isMobileOpe
       )}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-6 border-b border-border">
+          <div className="p-4 sm:p-6 border-b border-border">
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
-                <h1 className="text-xl type-headline">Fogees Corner</h1>
-                <p className="mt-1 text-[11px] text-muted-foreground type-eyebrow opacity-80">A Fogees social media platform</p>
+                <h1 className="text-lg sm:text-xl type-headline">Fogees Corner</h1>
+                <p className="mt-1 text-[10px] sm:text-[11px] text-muted-foreground type-eyebrow opacity-80">A Fogees social media platform</p>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onMobileClose}
-                className="lg:hidden"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <NotificationButton 
+                  onClick={() => setIsNotificationOpen(true)} 
+                  unreadCount={unreadCount}
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onMobileClose}
+                  className="lg:hidden flex-shrink-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 p-3 sm:p-4 space-y-2 overflow-y-auto">
             {tabs.map((tab) => {
               const Icon = tab.icon
               const isActive = currentView === tab.id
@@ -111,18 +131,18 @@ export function SidebarNavigation({ currentView, onViewChange, user, isMobileOpe
                   )}
                   onClick={() => handleTabClick(tab)}
                 >
-                  <Icon className="h-5 w-5" />
-                  <span className="type-link text-sm">{tab.label}</span>
+                  <Icon className="h-5 w-5 flex-shrink-0" />
+                  <span className="type-link text-sm truncate">{tab.label}</span>
                 </Button>
               )
             })}
           </nav>
 
           {/* User info and sign out */}
-          <div className="p-4 border-t border-border space-y-4">
+          <div className="p-3 sm:p-4 border-t border-border space-y-4">
             <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                <User className="h-5 w-5 text-primary" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">
@@ -139,12 +159,18 @@ export function SidebarNavigation({ currentView, onViewChange, user, isMobileOpe
               className="w-full justify-start gap-2"
               onClick={handleSignOut}
             >
-              <LogOut className="h-4 w-4" />
-              <span className="type-link text-sm">Sign Out</span>
+              <LogOut className="h-4 w-4 flex-shrink-0" />
+              <span className="type-link text-sm truncate">Sign Out</span>
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Notification Center */}
+      <NotificationCenter 
+        isOpen={isNotificationOpen} 
+        onClose={() => setIsNotificationOpen(false)} 
+      />
     </>
   )
 }

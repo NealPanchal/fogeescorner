@@ -89,3 +89,17 @@ export interface UserSettings {
   }
   updatedAt: any
 }
+
+export interface Notification {
+  id: string
+  userId: string
+  type: 'like' | 'comment' | 'upvote' | 'follow' | 'spotlight' | 'trending'
+  actorId: string
+  actorName: string
+  actorPhotoURL?: string | null
+  postId?: string
+  postContent?: string
+  commentContent?: string
+  read: boolean
+  createdAt: any
+}

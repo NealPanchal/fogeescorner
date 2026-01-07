@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { subscribeToComments, addComment } from "@/lib/comments"
 import { addUpvote, removeUpvote } from "@/lib/upvotes"
+import { notifyLike, notifyComment, notifyUpvote } from "@/lib/notifications"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -69,6 +70,20 @@ export function PostCard({ post, currentUserId, currentUser, onProfileView }: Po
         currentUser?.photoURL || null,
         commentText.trim()
       )
+      
+      // Send notification to post author
+      if (post.userId !== currentUserId) {
+        await notifyComment(
+          post.userId,
+          currentUserId,
+          currentUser?.displayName || "Anonymous",
+          currentUser?.photoURL || null,
+          post.id,
+          post.content || post.caption || "",
+          commentText.trim()
+        )
+      }
+      
       setCommentText("")
     } catch (error) {
       console.error("Error adding comment:", error)
@@ -94,6 +109,18 @@ export function PostCard({ post, currentUserId, currentUser, onProfileView }: Po
           likedBy: arrayUnion(currentUserId),
           likes: increment(1),
         })
+        
+        // Send notification to post author
+        if (post.userId !== currentUserId) {
+          await notifyLike(
+            post.userId,
+            currentUserId,
+            currentUser?.displayName || "Anonymous",
+            currentUser?.photoURL || null,
+            post.id,
+            post.content || post.caption || ""
+          )
+        }
       }
     } catch (error) {
       console.error("Error toggling like:", error)
@@ -122,6 +149,16 @@ export function PostCard({ post, currentUserId, currentUser, onProfileView }: Po
       } else {
         await addUpvote(post.id, currentUserId)
         console.log('Upvote added')
+        
+        // Send notification to post author
+        await notifyUpvote(
+          post.userId,
+          currentUserId,
+          currentUser?.displayName || "Anonymous",
+          currentUser?.photoURL || null,
+          post.id,
+          post.content || post.caption || ""
+        )
       }
     } catch (error) {
       console.error("Error toggling upvote:", error)

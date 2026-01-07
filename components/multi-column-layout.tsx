@@ -21,22 +21,22 @@ export function MultiColumnLayout({ sidebar, mainContent, rightColumn }: MultiCo
   return (
     <div className="min-h-screen bg-background main-gradient">
       <div className="flex">
-        {/* Left Sidebar - Fixed */}
-        <div className="fixed left-0 top-0 h-full w-64 lg:w-72 z-50">
+        {/* Left Sidebar - Fixed on desktop, hidden on mobile */}
+        <div className="hidden lg:block fixed left-0 top-0 h-full w-64 lg:w-72 z-50">
           {sidebar}
         </div>
 
-        {/* Main Content Area - Scrollable */}
+        {/* Main Content Area - Full width on mobile, with margin on desktop */}
         <div className="flex-1 lg:ml-64 lg:ml-72 min-h-screen">
-          <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
-            <div className="flex gap-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+            <div className="flex gap-4 sm:gap-6">
               
               {/* Center Column - Primary Feed */}
               <div className="flex-1 max-w-2xl min-w-0">
                 {mainContent}
               </div>
 
-              {/* Right Column - Optional */}
+              {/* Right Column - Hidden on smaller screens */}
               {rightColumn && (
                 <div className="hidden xl:block w-80 flex-shrink-0">
                   <div className="sticky top-6 space-y-6">

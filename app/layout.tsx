@@ -24,6 +24,7 @@ export const metadata: Metadata = {
   title: "Fogees Corner",
   description: "A Fogees social media platform",
   generator: "v0.app",
+  viewport: "width=device-width, initial-scale=1",
   icons: {
     icon: "/icon.svg",
     shortcut: "/icon.svg",
